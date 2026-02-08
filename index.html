@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Be My Valentine 💖</title>
+<title>Be My Valentine ❤️</title>
 
 <style>
   * { box-sizing: border-box; }
@@ -15,31 +15,37 @@
     font-family: 'Segoe UI', Tahoma, sans-serif;
   }
 
-  .container {
-    position: relative;
-    z-index: 2;
-    height: 100%;
+  /* Screens */
+  .screen {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 0.5s ease;
   }
+
+  #mainScreen { opacity: 1; pointer-events: auto; }
+  #successScreen { opacity: 0; pointer-events: none; }
 
   .card {
     background: white;
-    width: 85%;
+    width: 90%;
     max-width: 1000px;
     padding: 40px;
     border-radius: 25px;
     text-align: center;
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    z-index: 2;
   }
 
   h1 {
     color: #ff4d6d;
-    font-size: 2.8rem;
+    font-size: 2.7rem;
     margin-bottom: 25px;
   }
 
+  /* Gallery */
   .gallery {
     display: flex;
     justify-content: center;
@@ -51,18 +57,18 @@
     width: 220px;
     height: 220px;
     object-fit: cover;
-    border-radius: 22px;
+    border-radius: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    transition: transform 0.3s ease;
   }
 
-  .gallery img:hover {
-    transform: scale(1.12);
-  }
-
+  /* Buttons container — HARD BOUNDARY */
   .buttons {
     position: relative;
+    width: 100%;
+    max-width: 500px;
     height: 120px;
+    margin: 0 auto;
+    border: 2px dashed transparent; /* for debugging if needed */
   }
 
   button {
@@ -70,27 +76,24 @@
     padding: 14px 38px;
     border-radius: 40px;
     border: none;
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
   }
 
   #yesBtn {
     background: #ff4d6d;
     color: white;
-    left: 27%;
+    left: 40px;
     bottom: 20px;
-  }
-
-  #yesBtn:hover {
-    transform: scale(1.15);
   }
 
   #noBtn {
     background: #ddd;
-    right: 27%;
+    right: 40px;
     bottom: 20px;
   }
 
+  /* Hearts */
   .heart {
     position: absolute;
     bottom: -20px;
@@ -105,13 +108,16 @@
     to { transform: translateY(-120vh); opacity: 0; }
   }
 
-  #successScreen {
-    display: none;
-    height: 100vh;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
+  /* Success screen button */
+  #backBtn {
+    background: #ff4d6d;
+    color: white;
+    margin-top: 30px;
+    font-size: 22px;
+    padding: 14px 40px;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
   }
 </style>
 </head>
@@ -119,57 +125,84 @@
 <body onclick="startMusic()">
 
 <!-- MUSIC (never removed) -->
-<audio id="bgMusic" loop>
+<audio id="bgMusic" loop preload="auto">
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<!-- MAIN CONTENT -->
-<div id="mainScreen" class="container">
+<!-- MAIN SCREEN -->
+<div id="mainScreen" class="screen">
   <div class="card">
     <h1>Will you be my Valentine? 💕</h1>
 
     <div class="gallery">
-      <img src="images/pic1.jpg">
-      <img src="images/pic2.jpg">
-      <img src="images/pic3.jpg">
+      <img src="pic1.jpg">
+      <img src="pic2.jpg">
+      <img src="pic3.jpg">
     </div>
 
-    <div class="buttons">
-      <button id="yesBtn" onclick="sayYes()">Yes 💖</button>
+    <div class="buttons" id="buttonBox">
+      <button id="yesBtn">Yes 💖</button>
       <button id="noBtn">No 😢</button>
     </div>
   </div>
 </div>
 
 <!-- SUCCESS SCREEN -->
-<div id="successScreen" class="container">
-  <h1 style="font-size:3.5rem;color:#ff4d6d;">
-    SHE SAID YES 💕🥰<br>
-    Happy Valentine’s Day ❤️
-  </h1>
+<div id="successScreen" class="screen">
+  <div style="text-align:center;">
+    <h1 style="font-size:3.4rem;color:#ff4d6d;">
+      SHE SAID YES 💕🥰
+    </h1>
+    <button id="backBtn">I love you ❤️</button>
+  </div>
 </div>
 
 <script>
-  // Music
+  /* Music */
   let musicStarted = false;
+  const music = document.getElementById("bgMusic");
+
   function startMusic() {
     if (!musicStarted) {
-      document.getElementById("bgMusic").play();
+      music.play();
       musicStarted = true;
     }
   }
 
-  // Runaway No button
-  const noBtn = document.getElementById("noBtn");
-  noBtn.addEventListener("mouseover", () => {
-    const card = document.querySelector(".card");
-    const rect = card.getBoundingClientRect();
+  /* Screen switching */
+  const mainScreen = document.getElementById("mainScreen");
+  const successScreen = document.getElementById("successScreen");
 
-    noBtn.style.left = Math.random() * (rect.width - noBtn.offsetWidth) + "px";
-    noBtn.style.top  = Math.random() * (rect.height - noBtn.offsetHeight) + "px";
+  document.getElementById("yesBtn").onclick = () => {
+    mainScreen.style.opacity = "0";
+    mainScreen.style.pointerEvents = "none";
+    successScreen.style.opacity = "1";
+    successScreen.style.pointerEvents = "auto";
+  };
+
+  document.getElementById("backBtn").onclick = () => {
+    successScreen.style.opacity = "0";
+    successScreen.style.pointerEvents = "none";
+    mainScreen.style.opacity = "1";
+    mainScreen.style.pointerEvents = "auto";
+  };
+
+  /* Runaway NO button — CANNOT ESCAPE */
+  const noBtn = document.getElementById("noBtn");
+  const box = document.getElementById("buttonBox");
+
+  noBtn.addEventListener("mouseover", () => {
+    const maxX = box.clientWidth - noBtn.offsetWidth;
+    const maxY = box.clientHeight - noBtn.offsetHeight;
+
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
   });
 
-  // Floating hearts
+  /* Floating hearts */
   function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
@@ -177,18 +210,11 @@
     heart.style.left = Math.random() * 100 + "vw";
     heart.style.fontSize = (18 + Math.random() * 30) + "px";
     heart.style.animationDuration = (4 + Math.random() * 4) + "s";
-
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 8000);
   }
 
-  setInterval(createHeart, 250);
-
-  // YES logic (no page wipe)
-  function sayYes() {
-    document.getElementById("mainScreen").style.display = "none";
-    document.getElementById("successScreen").style.display = "flex";
-  }
+  setInterval(createHeart, 260);
 </script>
 
 </body>
